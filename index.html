@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff8e8" />
+  <title>Word Garden — A Reading Adventure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap');
+    :root { --ink:#27334b; --muted:#727e91; --coral:#ff7968; --yellow:#ffc857; --green:#58b987; --lilac:#a98be8; --paper:#fffdf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:'Nunito', ui-rounded, system-ui, sans-serif; background:linear-gradient(180deg,#fff8e8 0%,#f7f3ff 54%,#e9f8f0 100%); overflow-x:hidden; }
+    button { font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .sky { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+    .cloud { position:absolute; color:#fff; opacity:.8; font-size:4.5rem; filter:drop-shadow(0 6px 0 #f2edff); animation:float 7s ease-in-out infinite; }
+    .cloud.one { top:7%;left:5%; }.cloud.two { top:17%;right:7%;font-size:3.5rem;animation-delay:-3s; }
+    @keyframes float { 50% { transform:translateY(-12px); } }
+    .app { width:min(100% - 32px,820px); margin:0 auto; padding:20px 0 34px; min-height:100vh; display:flex; flex-direction:column; }
+    header { display:flex; align-items:center; justify-content:space-between; min-height:52px; }
+    .brand { display:flex;align-items:center;gap:9px;font-size:1.1rem;font-weight:1000;letter-spacing:-.4px; }
+    .brand-mark { width:37px;height:37px;display:grid;place-items:center;background:#fff;border-radius:13px;box-shadow:0 4px 0 #f3d98e;font-size:1.3rem; }
+    .header-actions { display:flex;gap:8px;align-items:center; }
+    .sound-toggle,.directions-toggle { border:0;background:#fff;border-radius:99px;padding:9px 13px;color:var(--ink);font-weight:800;box-shadow:0 3px 0 #eae3d6; }
+    .directions-toggle { background:#f1edff;color:#65558f; }
+    main { flex:1; display:flex;align-items:center;justify-content:center;padding:22px 0; }
+    .screen { width:100%; animation:appear .35s ease both; }
+    @keyframes appear { from {opacity:0;transform:translateY(10px)} to {opacity:1;transform:translateY(0)} }
+    .panel { background:rgba(255,253,248,.96);border:3px solid #fff;border-radius:32px;padding:clamp(22px,5vw,45px);box-shadow:0 12px 0 rgba(71,71,117,.08),0 24px 60px rgba(76,68,111,.08);text-align:center; }
+    .eyebrow { color:#8a78c7;text-transform:uppercase;letter-spacing:2.5px;font-size:.76rem;font-weight:1000; }
+    h1,h2,p { margin-top:0; }
+    h1 { font-size:clamp(2.7rem,8vw,5rem);line-height:.98;letter-spacing:-3px;margin:12px 0;color:#3e4a68; }
+    h1 span { color:var(--coral); }
+    .intro { max-width:465px;margin:0 auto 25px;color:var(--muted);font-weight:700;font-size:1.08rem;line-height:1.55; }
+    .garden-art { font-size:clamp(4.5rem,15vw,7.5rem);line-height:1.25;margin:8px 0 14px;filter:drop-shadow(0 7px 0 rgba(101,179,128,.13)); }
+    .primary { border:0;border-radius:18px;background:var(--coral);color:white;padding:15px 27px;box-shadow:0 6px 0 #e55e50;font-size:1.1rem;font-weight:1000;transition:transform .13s,box-shadow .13s; }
+    .primary:hover { transform:translateY(-2px);box-shadow:0 8px 0 #e55e50; }.primary:active { transform:translateY(4px);box-shadow:0 2px 0 #e55e50; }
+    .tiny-note { color:#9aa1af;font-size:.82rem;font-weight:700;margin:18px 0 0; }
+    .game-top { display:flex;align-items:center;gap:14px;margin:0 0 20px; }
+    .back { border:0;background:#fff;border-radius:14px;width:44px;height:44px;font-size:1.15rem;box-shadow:0 3px 0 #e8e3d9;color:var(--ink); }
+    .progress-wrap { flex:1; }
+    .progress-label { display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);font-weight:900;margin:0 2px 7px; }
+    .track { height:13px;background:#e9e5f4;border-radius:99px;overflow:hidden; }
+    .fill { height:100%;width:0;background:linear-gradient(90deg,#82d7a7,#54bb8c);border-radius:99px;transition:width .45s ease; }
+    .step-label { display:inline-flex;align-items:center;gap:7px;background:#f1edff;color:#7664b3;padding:8px 13px;border-radius:99px;font-weight:1000;font-size:.85rem;margin:0 0 13px; }
+    .game-title { font-size:clamp(1.65rem,5vw,2.35rem);letter-spacing:-1px;margin:0 0 7px; }
+    .game-copy { color:var(--muted);font-weight:700;margin:0 0 21px; }
+    .listen { border:0;background:#fff4d4;color:#765d20;border-radius:16px;padding:11px 16px;font-weight:1000;box-shadow:0 4px 0 #f0dda9;margin:0 0 20px; }
+    .listen:hover { transform:translateY(-1px); }
+    .choices { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:560px;margin:0 auto; }
+    .choice { min-height:144px;border:3px solid #f0edf5;border-radius:23px;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--ink);transition:.16s; }
+    .choice:hover { transform:translateY(-4px);border-color:#d9cff8;box-shadow:0 7px 0 #eee8fa; }
+    .choice .picture { font-size:3.6rem;line-height:1.15; }.choice .name { font-size:.9rem;font-weight:900;color:#9298a6; }
+    .choice.correct { border-color:#73c99a;background:#edfff4;animation:pop .3s ease; }.choice.wrong { border-color:#ff9c8c;background:#fff3f0;animation:shake .28s; }
+    @keyframes pop { 50% { transform:scale(1.07); } } @keyframes shake { 25% {transform:translateX(-5px)}75%{transform:translateX(5px)} }
+    .feedback { min-height:29px;margin:16px 0 0;color:#56a778;font-weight:1000;font-size:1.03rem; }
+    .word-picture { font-size:4.2rem;line-height:1.2;margin:0 0 12px; }
+    .slots { display:flex;justify-content:center;gap:9px;margin:20px 0 17px; }
+    .slot { width:clamp(48px,12vw,66px);height:68px;border:3px dashed #d8d1ea;border-radius:17px;background:#fff;display:grid;place-items:center;font-size:2rem;font-weight:1000;text-transform:uppercase;color:#485572;transition:.15s; }
+    .slot.filled { border-style:solid;border-color:#b6e6ca;background:#f1fff6; }
+    .tiles { display:flex;justify-content:center;gap:9px;flex-wrap:wrap;min-height:57px; }
+    .tile { width:52px;height:52px;border:0;border-radius:15px;background:#fff;color:#514879;box-shadow:0 4px 0 #dcd5ee;font-size:1.45rem;font-weight:1000;text-transform:uppercase;transition:.14s; }
+    .tile:hover:not(:disabled) { transform:translateY(-3px);background:#f5f1ff; }.tile:disabled { opacity:.35;box-shadow:none;cursor:default; }
+    .game-actions { display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap; }
+    .secondary { border:0;background:#f0edf7;color:#655b83;border-radius:14px;padding:11px 18px;font-weight:1000; }.secondary:hover{background:#e6e0f4}
+    .check { background:var(--green);box-shadow:0 5px 0 #39996a;padding:12px 22px; }.check:hover{box-shadow:0 7px 0 #39996a}.check:active{box-shadow:0 2px 0 #39996a}
+    .check:disabled { opacity:.45;cursor:default;transform:none;box-shadow:none; }
+    .complete-stars { font-size:2.2rem;letter-spacing:7px;margin:8px 0 12px;animation:pop .5s ease; }
+    .celebration-art { font-size:clamp(3.7rem,12vw,5.5rem);margin:12px 0 8px;animation:pop .55s ease; }
+    .celebration-copy { max-width:480px;margin:0 auto 24px;color:var(--muted);font-size:1.08rem;line-height:1.55;font-weight:800; }
+    .confetti { position:fixed;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall 2.5s linear forwards;pointer-events:none;z-index:5; }
+    @keyframes fall { to { transform:translateY(110vh) rotate(700deg);opacity:.1; } }
+    footer { text-align:center;color:#8e93a0;font-weight:700;font-size:.78rem;padding-top:4px; }
+    @media(max-width:520px) { .app{width:min(100% - 22px,820px);padding-top:12px}header{flex-direction:column;gap:10px}.header-actions{gap:6px}.header-actions button{padding:8px 10px;font-size:.82rem}.panel{border-radius:25px;padding:23px 16px}.choices{gap:8px}.choice{min-height:122px;border-radius:18px}.choice .picture{font-size:2.8rem}.choice .name{font-size:.78rem}.cloud.one{left:-8%;top:8%}.cloud.two{right:-5%}.game-copy{font-size:.93rem} }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important; } }
+  </style>
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="cloud one">☁️</div><div class="cloud two">☁️</div></div>
+  <div class="app">
+    <header><div class="brand"><span class="brand-mark">🌱</span> Word Garden</div><div class="header-actions"><button class="directions-toggle" id="hearDirections">🗣 Hear directions</button><button class="sound-toggle" id="soundToggle" aria-label="Toggle read aloud">🔊 Sound on</button></div></header>
+    <main id="main" aria-live="polite"></main>
+    <footer>A little reading adventure, made just for you ✨ · Some narration is AI-generated.</footer>
+  </div>
+  <script id="marin-audio-manifest" type="application/json">{"A": "voice-samples/game-audio/559aead08264d5795d39.mp3", "Almost! Let’s listen and try again.": "voice-samples/game-audio/fe41e1a61378617ae4c0.mp3", "Amazing blending, Madeline! You blended sounds to read those words!": "voice-samples/game-audio/e61d0c50e6f2cbea5ce4.mp3", "Build the word. Listen to bed, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/795f1311d7eebf07a7ab.mp3", "Build the word. Listen to chat, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/5221d0b46b05dfc32377.mp3", "Build the word. Listen to flag, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/466cf3fe778e87b273bd.mp3", "Build the word. Listen to frog, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/df929f74c29d5ec768c1.mp3", "Build the word. Listen to gym, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/c04e75e61b610d182628.mp3", "Build the word. Listen to hot, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/5c873978f4693a875439.mp3", "Build the word. Listen to pin, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/69799a840cb74bb34423.mp3", "Build the word. Listen to ship, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/9e0968bf902cdbe31f51.mp3", "Build the word. Listen to sun, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/269e1fceff0834876c75.mp3", "Build the word. Listen to swim, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/07ec92dc4184b28fbae1.mp3", "Build the word. Listen to thin, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.": "voice-samples/game-audio/bf4cc5d1d8a7d8bd4f84.mp3", "E says eh, as in bed.": "voice-samples/game-audio/8fb4ee91df490e3742a4.mp3", "E. E says eh, as in bed.": "voice-samples/game-audio/0102a403b2547d2c2a7d.mp3", "Good try. Listen to the word again.": "voice-samples/game-audio/7c6d109afcd8340b169d.mp3", "Hooray! You grew so many words! You practiced vowel sounds and read words. You are a wonderful word explorer!": "voice-samples/game-audio/ce8995356dfa83a37357.mp3", "Hooray, Madeline! You read those short words and your little story!": "voice-samples/game-audio/2b218778a0d9f775b8d3.mp3", "I says ih, as in pin.": "voice-samples/game-audio/b957b58493fb05ea097b.mp3", "I. I says ih, as in pin.": "voice-samples/game-audio/a3aacd4342197f327089.mp3", "Let’s play again!": "voice-samples/game-audio/38a41c1ce2ba40b4b015.mp3", "Nice try. Let’s hear it again.": "voice-samples/game-audio/3c20384425293204f523.mp3", "O says ah, as in hot.": "voice-samples/game-audio/ddce975191baafb9e110.mp3", "O. O says ah, as in hot.": "voice-samples/game-audio/eba56ba738fb616ff95b.mp3", "Reading break. Tap any word to hear it. Then read the sentence again with your grown-up. Or press Read it to me to hear the whole story.": "voice-samples/game-audio/c04c1ef1735ba3e745f1.mp3", "Sound detective. Listen to the word bed. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the beginning. Press Hear the word to listen again.": "voice-samples/game-audio/3ad61066a63571deeb60.mp3", "Sound detective. Listen to the word chat. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the ending. Press Hear the word to listen again.": "voice-samples/game-audio/022e4dcc0d91e1b629fd.mp3", "Sound detective. Listen to the word flag. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the ending. Press Hear the word to listen again.": "voice-samples/game-audio/227f8afd9331f1d9bfce.mp3", "Sound detective. Listen to the word frog. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the beginning. Press Hear the word to listen again.": "voice-samples/game-audio/3fe0895d8a9e7fdb08a1.mp3", "Sound detective. Listen to the word gym. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the middle. Press Hear the word to listen again.": "voice-samples/game-audio/cc6c134f2e69b9cb77b6.mp3", "Sound detective. Listen to the word hot. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the middle. Press Hear the word to listen again.": "voice-samples/game-audio/0087c8a9672d38a4d30c.mp3", "Sound detective. Listen to the word pin. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the ending. Press Hear the word to listen again.": "voice-samples/game-audio/e2ce789b0b42938b2777.mp3", "Sound detective. Listen to the word ship. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the beginning. Press Hear the word to listen again.": "voice-samples/game-audio/91ec4ba6239272a38c97.mp3", "Sound detective. Listen to the word sun. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the beginning. Press Hear the word to listen again.": "voice-samples/game-audio/3bd29f3333952ff7a1ff.mp3", "Sound detective. Listen to the word swim. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the middle. Press Hear the word to listen again.": "voice-samples/game-audio/97d59783e0032156963a.mp3", "Sound detective. Listen to the word thin. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the middle. Press Hear the word to listen again.": "voice-samples/game-audio/bcafa764efabd01862a7.mp3", "The": "voice-samples/game-audio/b344d80e24a3679999fa.mp3", "The frog can swim. A flag is on the rock.": "voice-samples/game-audio/996014c677b6991fcd9e.mp3", "The ship is big. The thin fish can chat.": "voice-samples/game-audio/3237aa16f2d35284a79b.mp3", "The sun is hot. A bug is on the bed.": "voice-samples/game-audio/6d7e6563d3e64d07a276.mp3", "U says uh, as in sun.": "voice-samples/game-audio/2f15fe9f62cea178c7b2.mp3", "U. U says uh, as in sun.": "voice-samples/game-audio/c13cd4c3a18f85d844f4.mp3", "Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. E says eh, as in bed.": "voice-samples/game-audio/d032a4718a8b0835ed63.mp3", "Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. I says ih, as in pin.": "voice-samples/game-audio/56b3da5f6e9132894d03.mp3", "Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. O says ah, as in hot.": "voice-samples/game-audio/7e36b04fdc28bdf6581b.mp3", "Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. U says uh, as in sun.": "voice-samples/game-audio/10c3179ecbe81975c1aa.mp3", "Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. Y is sometimes a vowel. In gym, y says short i.": "voice-samples/game-audio/32a77b689f9a470a15be.mp3", "Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.": "voice-samples/game-audio/7c49051ee541516fb6d0.mp3", "Y is sometimes a vowel. In gym, y says short i.": "voice-samples/game-audio/99353ab629a4c0ff1b37.mp3", "Y. Y is sometimes a vowel. In gym, y says short i.": "voice-samples/game-audio/428f12df65ecc9f37ce7.mp3", "Yes! bed. You heard b in the beginning. Now let’s build it!": "voice-samples/game-audio/e83d64ac41686af7168e.mp3", "Yes! chat. You heard t in the ending. Now let’s build it!": "voice-samples/game-audio/dbf4f26ee0fa95bc60f8.mp3", "Yes! flag. You heard g in the ending. Now let’s build it!": "voice-samples/game-audio/290860693eb9e999fe06.mp3", "Yes! frog. You heard f in the beginning. Now let’s build it!": "voice-samples/game-audio/2c52b4f04237ba07bbbf.mp3", "Yes! gym. You heard y in the middle. Now let’s build it!": "voice-samples/game-audio/ed7e504928702bdc798f.mp3", "Yes! hot. You heard o in the middle. Now let’s build it!": "voice-samples/game-audio/b4da4ed687db445393bd.mp3", "Yes! pin. You heard n in the ending. Now let’s build it!": "voice-samples/game-audio/aeb1e4fd388312a565d8.mp3", "Yes! ship. You heard sh in the beginning. Now let’s build it!": "voice-samples/game-audio/6c0e9ae9aa73ac6015ee.mp3", "Yes! sun. You heard s in the beginning. Now let’s build it!": "voice-samples/game-audio/fcde54f76db30c1be82f.mp3", "Yes! swim. You heard w in the middle. Now let’s build it!": "voice-samples/game-audio/935054ba9390dd37597c.mp3", "Yes! thin. You heard i in the middle. Now let’s build it!": "voice-samples/game-audio/2126a95e66a7ca89a17c.mp3", "You did it, Madeline! You read words with sh, th, and ch. Those letter teams make one sound!": "voice-samples/game-audio/9cc5cbfa65e0508fb9e0.mp3", "You did it, Madeline! Your vowel garden is blooming. You practiced five vowel sounds!": "voice-samples/game-audio/933712e8603778a6eb65.mp3", "bed": "voice-samples/game-audio/c5052532c2206140dfdc.mp3", "bed! You sounded it out!": "voice-samples/game-audio/9c9f5186c42e33133bcb.mp3", "big": "voice-samples/game-audio/2a21fe6d592a19b7de89.mp3", "bug": "voice-samples/game-audio/ecb53f367b3541da3a14.mp3", "can": "voice-samples/game-audio/9f584196e7fe6de85d38.mp3", "chat": "voice-samples/game-audio/31e06f7d89feb99a0e6c.mp3", "chat! You sounded it out!": "voice-samples/game-audio/e2baa1a881e30d2dda92.mp3", "fish": "voice-samples/game-audio/b474a99a2705e23cf905.mp3", "flag": "voice-samples/game-audio/807d0fbcae7c4b20518d.mp3", "flag! You sounded it out!": "voice-samples/game-audio/8c59b0327c04f0a93c4f.mp3", "frog": "voice-samples/game-audio/74fa5327cc0f4e947789.mp3", "frog! You sounded it out!": "voice-samples/game-audio/aea03115c361ee4fff47.mp3", "gym": "voice-samples/game-audio/e326cff641fb950a5bdb.mp3", "gym! You sounded it out!": "voice-samples/game-audio/7a815fa3368648c214e2.mp3", "hot": "voice-samples/game-audio/7f5d1618e7d28cc7bf32.mp3", "hot! You sounded it out!": "voice-samples/game-audio/79a5f3af9e0c6a50db1f.mp3", "is": "voice-samples/game-audio/fa51fd49abf67705d6a3.mp3", "on": "voice-samples/game-audio/b8d31e852725afb1e26d.mp3", "pin": "voice-samples/game-audio/64f46a7526a186d23465.mp3", "pin! You sounded it out!": "voice-samples/game-audio/1e6f5a21eae2b67ffcdb.mp3", "rock": "voice-samples/game-audio/350a770c0ec9f353e1a5.mp3", "ship": "voice-samples/game-audio/e5d5b971139eefeb36d6.mp3", "ship! You sounded it out!": "voice-samples/game-audio/687f2f59cf8b945d165d.mp3", "sun": "voice-samples/game-audio/27756f050e14a1cb1c1e.mp3", "sun! You sounded it out!": "voice-samples/game-audio/6e7f68517578bc988525.mp3", "swim": "voice-samples/game-audio/d493f8869139bac710b9.mp3", "swim! You sounded it out!": "voice-samples/game-audio/1ba60d895484524439df.mp3", "the": "voice-samples/game-audio/b9776d7ddf459c9ad5b0.mp3", "thin": "voice-samples/game-audio/1a0dc227b5aa78f84008.mp3", "thin! You sounded it out!": "voice-samples/game-audio/0c01f351d700d1a81872.mp3"}</script>
+  <script>
+    const vowels = [
+      { letter:'u', cue:'short u, as in sun', say:'U says uh, as in sun.' },
+      { letter:'o', cue:'short o, as in hot', say:'O says ah, as in hot.' },
+      { letter:'i', cue:'short i, as in pin', say:'I says ih, as in pin.' },
+      { letter:'e', cue:'short e, as in bed', say:'E says eh, as in bed.' },
+      { letter:'y', cue:'the y in gym says short i', say:'Y is sometimes a vowel. In gym, y says short i.' }
+    ];
+    const levels = [
+      { name:'Short words', story:'The sun is hot. A bug is on the bed.', words:[
+        { word:'sun', phonemes:['s','u','n'], emoji:'☀️' },
+        { word:'hot', phonemes:['h','o','t'], emoji:'🌞' },
+        { word:'pin', phonemes:['p','i','n'], emoji:'📍' },
+        { word:'bed', phonemes:['b','e','d'], emoji:'🛏️' },
+        { word:'gym', phonemes:['g','y','m'], emoji:'🤸' }
+      ]},
+      { name:'Words with blends', story:'The frog can swim. A flag is on the rock.', words:[
+        { word:'frog', phonemes:['f','r','o','g'], emoji:'🐸' },
+        { word:'swim', phonemes:['s','w','i','m'], emoji:'🏊' },
+        { word:'flag', phonemes:['f','l','a','g'], emoji:'🚩' }
+      ]},
+      { name:'Words with letter teams', story:'The ship is big. The thin fish can chat.', words:[
+        { word:'ship', phonemes:['sh','i','p'], emoji:'🚢' },
+        { word:'thin', phonemes:['th','i','n'], emoji:'🪶' },
+        { word:'chat', phonemes:['ch','a','t'], emoji:'💬' }
+      ]}
+    ];
+    const main = document.querySelector('#main');
+    const soundToggle = document.querySelector('#soundToggle');
+    const marinAudio = JSON.parse(document.querySelector('#marin-audio-manifest').textContent);
+    const audioPlayer = new Audio();
+    let soundOn = true, levelIndex = 0, wordIndex = 0, vowelIndex = 0, phase = 'home', letters = [], locked = false, englishVoice = null, savedAvailable = false, celebrationKey = null;
+    const SAVE_KEY = 'word-garden-progress-v1';
+    let currentDirections = 'Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.';
+    const level = () => levels[levelIndex];
+    const item = () => level().words[wordIndex];
+    function saveProgress() {
+      if (phase === 'home') return;
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify({levelIndex,wordIndex,vowelIndex,phase,letters,celebrationKey})); savedAvailable=true; }
+      catch (_) { /* Keep the game playable if browser storage is unavailable. */ }
+    }
+    function restoreProgress() {
+      try {
+        const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+        if(!saved||!['vowel','sound','build','story','celebrate','complete'].includes(saved.phase))return false;
+        if(!Number.isInteger(saved.levelIndex)||saved.levelIndex<0||saved.levelIndex>=levels.length)return false;
+        if(!Number.isInteger(saved.wordIndex)||saved.wordIndex<0||saved.wordIndex>=levels[saved.levelIndex].words.length)return false;
+        if(!Number.isInteger(saved.vowelIndex)||saved.vowelIndex<0||saved.vowelIndex>vowels.length)return false;
+        levelIndex=saved.levelIndex;wordIndex=saved.wordIndex;vowelIndex=saved.vowelIndex;
+        phase=saved.phase;letters=Array.isArray(saved.letters)?saved.letters:[];celebrationKey=saved.celebrationKey||null;savedAvailable=true;return true;
+      } catch (_) { return false; }
+    }
+    function resumeProgress() {
+      if(!restoreProgress())return renderHome();
+      if(phase==='vowel')renderVowel();
+      else if(phase==='sound')renderSound();
+      else if(phase==='build')renderBuild(true);
+      else if(phase==='story')renderStory();
+      else if(phase==='celebrate'&&celebrationKey)renderCelebration(celebrationKey);
+      else renderComplete();
+    }
+    function chooseVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = speechSynthesis.getVoices().filter(v => /^en(-|_)/i.test(v.lang));
+      // Respect the voice selected as the device's default instead of guessing which named voice sounds best.
+      return voices.find(v => v.default && /^en-US$/i.test(v.lang)) || voices.find(v => v.default) || voices[0] || null;
+    }
+    englishVoice = chooseVoice();
+    if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', () => { englishVoice = chooseVoice(); });
+    function speak(text, slow = false) {
+      if (!soundOn) return;
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      const clip = marinAudio[text];
+      if (clip) {
+        audioPlayer.pause(); audioPlayer.currentTime=0; audioPlayer.src=clip; audioPlayer.playbackRate=slow?.82:1;
+        audioPlayer.play().catch(() => speakWithBrowserVoice(text,slow));
+        return;
+      }
+      speakWithBrowserVoice(text,slow);
+    }
+    function speakWithBrowserVoice(text, slow = false) {
+      if (!soundOn || !('speechSynthesis' in window)) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (englishVoice) utterance.voice = englishVoice;
+      utterance.lang = 'en-US';
+      utterance.rate = slow ? .8 : .96;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      speechSynthesis.speak(utterance);
+    }
+    soundToggle.addEventListener('click', () => {
+      soundOn = !soundOn; soundToggle.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off';
+      if (!soundOn) {
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
+        audioPlayer.pause(); audioPlayer.currentTime=0;
+      }
+    });
+    document.querySelector('#hearDirections').addEventListener('click', () => speak(currentDirections));
+    function setDirections(text, autoRead = true) {
+      currentDirections = text;
+      if (autoRead) setTimeout(() => speak(currentDirections), 450);
+    }
+    function renderHome() {
+      phase = 'home';
+      setDirections('Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.', false);
+      main.innerHTML = `<section class="screen panel"><div class="eyebrow">A tiny adventure in reading</div><div class="garden-art" aria-hidden="true">🌼 🐝 🌷</div><h1>Welcome to<br><span>Word Garden!</span></h1><p class="intro">Warm up your vowel sounds, listen for sounds in words, then build and read short words, words with blends, and words with letter teams.</p>${savedAvailable?'<button class="secondary" id="continue" style="margin:0 8px 12px">Continue adventure ↗</button>':''}<button class="primary" id="start">${savedAvailable?'Start over':'Let’s play!'} <span aria-hidden="true">→</span></button><p class="tiny-note">No rush. Listen again, sound it out, and celebrate every try 💛</p></section>`;
+      if(savedAvailable)document.querySelector('#continue').onclick=resumeProgress;
+      document.querySelector('#start').addEventListener('click', () => { try{localStorage.removeItem(SAVE_KEY);}catch(_){} savedAvailable=false; levelIndex=0; wordIndex=0; vowelIndex=0; letters=[]; renderVowel(); });
+    }
+    function progress(label, count, current) { return `<div class="game-top"><button class="back" id="home" aria-label="Go to home">←</button><div class="progress-wrap"><div class="progress-label"><span>${label}</span><span>${current} of ${count}</span></div><div class="track"><div class="fill" style="width:${Math.max(5,(current-1)/count*100)}%"></div></div></div></div>`; }
+    function hookHome() { document.querySelector('#home').onclick = renderHome; }
+    function renderVowel() {
+      phase='vowel'; locked=false; saveProgress();
+      const v=vowels[vowelIndex];
+      setDirections(`Vowel warm-up. I will say a vowel sound and a word. Tap the letter that makes that sound. Press Hear the sound to hear it again. ${v.say}`);
+      const options=[...new Set([v.letter,...vowels.map(x=>x.letter)])].sort(()=>Math.random()-.5);
+      main.innerHTML=`<section class="screen">${progress('Vowel warm-up',vowels.length,vowelIndex+1)}<div class="panel"><div class="step-label">🔤 Warm up · Vowel names &amp; sounds</div><h2 class="game-title">Which letter says…?</h2><p class="game-copy">${v.cue}</p><button class="listen" id="listen">🔊 &nbsp;Hear the sound</button><div class="choices">${options.map(ch=>`<button class="choice vowel-choice" data-letter="${ch}" aria-label="${ch.toUpperCase()}"><span class="picture">${ch.toUpperCase()}${ch}</span><span class="name">${ch=== 'y'?'sometimes a vowel':'letter '+ch.toUpperCase()}</span></button>`).join('')}</div><div class="feedback" id="feedback">Tap a letter. You can listen again any time!</div></div></section>`;
+      hookHome();
+      document.querySelector('#listen').onclick=()=>speak(v.say);
+      document.querySelectorAll('.vowel-choice').forEach(btn=>btn.onclick=()=>{
+        if(locked)return;
+        if(btn.dataset.letter===v.letter){locked=true;btn.classList.add('correct');document.querySelector('#feedback').textContent=`That’s ${v.letter.toUpperCase()}! ${v.say} 🌟`;speak(`${v.letter.toUpperCase()}. ${v.say}`);setTimeout(()=>{vowelIndex++;vowelIndex<vowels.length?renderVowel():renderCelebration('vowels');},950);}
+        else{btn.classList.add('wrong');document.querySelector('#feedback').textContent='Nice try! Listen again and choose the letter you hear 💛';speak('Nice try. Let’s hear it again.');setTimeout(()=>btn.classList.remove('wrong'),500);}
+      });
+    }
+    function renderSound() {
+      phase='sound';locked=false;letters=[];saveProgress();
+      const w=item(), sounds=w.phonemes;
+      const position=wordIndex%3, names=['beginning','middle','ending'];
+      const soundIndex=position===0?0:position===1?Math.floor((sounds.length-1)/2):sounds.length-1;
+      const target=sounds[soundIndex];
+      setDirections(`Sound detective. Listen to the word ${w.word}. Beginning means first. Middle means inside. Ending means last. Tap the sound you hear in the ${names[position]}. Press Hear the word to listen again.`);
+      const distractors=['m','s','t','p','n','b','f','l','r','d','g','k','sh','ch'].filter(x=>!sounds.includes(x));
+      const choices=[target,...distractors.sort(()=>Math.random()-.5).slice(0,2)].sort(()=>Math.random()-.5);
+      main.innerHTML=`<section class="screen">${progress(level().name,level().words.length,wordIndex+1)}<div class="panel"><div class="step-label">👂 Sound detective · ${level().name}</div><h2 class="game-title">Listen for the ${names[position]} sound</h2><p class="game-copy">What sound do you hear at the ${names[position]} of this word?</p><div class="word-picture" aria-hidden="true">${w.emoji}</div><button class="listen" id="listen">🔊 &nbsp;Hear the word</button><div class="choices">${choices.map(c=>`<button class="choice sound-choice" data-sound="${c}" aria-label="Sound ${c}"><span class="picture" style="font-size:2.6rem">/${c}/</span><span class="name">sound</span></button>`).join('')}</div><div class="feedback" id="feedback">Say the word slowly and listen for that part.</div></div></section>`;
+      hookHome();document.querySelector('#listen').onclick=()=>speak(w.word,true);
+      document.querySelectorAll('.sound-choice').forEach(btn=>btn.onclick=()=>{
+        if(locked)return;
+        if(btn.dataset.sound===target){locked=true;btn.classList.add('correct');letters=[];phase='build';saveProgress();document.querySelector('#feedback').textContent=`You heard /${target}/ in the ${names[position]}! Now build the word!`;speak(`Yes! ${w.word}. You heard ${target} in the ${names[position]}. Now let’s build it!`);setTimeout(renderBuild,850);}
+        else{btn.classList.add('wrong');document.querySelector('#feedback').textContent='Good listening try! Hear the word slowly once more 💛';speak('Good try. Listen to the word again.');setTimeout(()=>btn.classList.remove('wrong'),500);}
+      });
+    }
+    function renderBuild(resume = false) {
+      phase='build';if(!resume)letters=[];saveProgress();
+      const w=item();
+      setDirections(`Build the word. Listen to ${w.word}, say each sound, then tap the sound tiles in order from left to right. Some sounds, like sh, use two letters together. Press Hear the word slowly if you need help.`);
+      const mixed=w.phonemes.map((letter,index)=>({letter,index}));
+      for(let i=mixed.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[mixed[i],mixed[j]]=[mixed[j],mixed[i]];}
+      main.innerHTML=`<section class="screen">${progress(level().name,level().words.length,wordIndex+1)}<div class="panel"><div class="step-label">🧩 Sound it out · ${level().name}</div><h2 class="game-title">Build the word</h2><p class="game-copy">Tap each sound tile in order. Blend the sounds together!</p><div class="word-picture" aria-hidden="true">${w.emoji}</div><button class="listen" id="listen">🔊 &nbsp;Hear the word slowly</button><div class="slots">${w.phonemes.map((_,i)=>`<button class="slot" data-slot="${i}" aria-label="Empty sound spot ${i+1}"></button>`).join('')}</div><div class="tiles">${mixed.map(({letter,index})=>`<button class="tile" data-index="${index}" aria-label="Sound ${letter}">${letter}</button>`).join('')}</div><div class="feedback" id="feedback">Each tile is one sound. Tap a filled spot to change it.</div><div class="game-actions"><button class="secondary" id="clear">↶ Start over</button><button class="primary check" id="check" disabled>Check it! ✓</button></div></div></section>`;
+      hookHome();document.querySelector('#listen').onclick=()=>speak(w.word,true);
+      const update=()=>{document.querySelectorAll('.slot').forEach((slot,i)=>{slot.textContent=letters[i]?.letter||'';slot.classList.toggle('filled',!!letters[i]);});document.querySelectorAll('.tile').forEach(tile=>tile.disabled=letters.some(x=>x.index===Number(tile.dataset.index)));document.querySelector('#check').disabled=letters.length!==w.phonemes.length;saveProgress();};
+      update();
+      document.querySelectorAll('.tile').forEach(tile=>tile.onclick=()=>{if(letters.length<w.phonemes.length){letters.push({letter:tile.textContent,index:Number(tile.dataset.index)});update();}});
+      document.querySelectorAll('.slot').forEach(slot=>slot.onclick=()=>{const i=Number(slot.dataset.slot);if(letters[i]){letters.splice(i,1);update();}});
+      document.querySelector('#clear').onclick=()=>{letters=[];update();document.querySelector('#feedback').textContent='Take your time—you’ve got this!';};
+      document.querySelector('#check').onclick=()=>{
+        if(letters.map(x=>x.letter).join('')===w.phonemes.join('')){document.querySelector('#feedback').textContent=`${w.word}! You sounded it out! 🌟`;speak(`${w.word}! You sounded it out!`);setTimeout(()=>{wordIndex++;if(wordIndex<level().words.length)renderSound();else renderStory();},950);}
+        else{document.querySelector('#feedback').textContent='Almost! Listen again and try moving a sound tile 💛';speak('Almost! Let’s listen and try again.');}
+      };
+    }
+    function renderStory() {
+      phase='story';saveProgress();
+      const sentences=level().story.split('. ').filter(Boolean);
+      setDirections('Reading break. Tap any word to hear it. Then read the sentence again with your grown-up. Or press Read it to me to hear the whole story.');
+      main.innerHTML=`<section class="screen">${progress(`${level().name} · reread`,level().words.length,level().words.length)}<div class="panel"><div class="step-label">📖 Little reading break · ${level().name}</div><h2 class="game-title">Read it together!</h2><p class="game-copy">Tap a word to hear it. Then read the sentence again with your grown-up.</p><div class="story-lines">${sentences.map(line=>`<p style="font-size:clamp(1.35rem,4.4vw,2rem);font-weight:900;line-height:1.65;margin:10px 0">${line.split(' ').map(word=>`<button class="secondary story-word" style="font-size:inherit;padding:4px 8px;margin:2px">${word}</button>`).join(' ')}</p>`).join('')}</div><div class="game-actions"><button class="listen" id="readStory">🔊 &nbsp;Read it to me</button><button class="primary" id="nextLevel">${levelIndex<levels.length-1?'Next word garden →':'Finish adventure ✨'}</button></div><div class="feedback" id="feedback">You did it! Every reread helps words feel easier.</div></div></section>`;
+      hookHome();document.querySelectorAll('.story-word').forEach(btn=>btn.onclick=()=>speak(btn.textContent.replace(/[.,!?]/g,'')));
+      document.querySelector('#readStory').onclick=()=>speak(level().story);
+      document.querySelector('#nextLevel').onclick=()=>renderCelebration(['cvc','blends','digraphs'][levelIndex]);
+    }
+    const celebrations = {
+      vowels:{title:'Vowel garden blooming!',copy:'You practiced five vowel sounds. Your listening is growing stronger!',speech:'You did it, Madeline! Your vowel garden is blooming. You practiced five vowel sounds!',art:'🌷 🌼 🌻',next:()=>renderSound()},
+      cvc:{title:'Short-word garden grown!',copy:'You read short words with three sounds and a whole little story. That is wonderful reading!',speech:'Hooray, Madeline! You read those short words and your little story!',art:'🌱 🌻 🐝',next:()=>{levelIndex=1;wordIndex=0;renderSound();}},
+      blends:{title:'Sound-blending star!',copy:'You blended sounds together at the start of words to read them. Amazing work!',speech:'Amazing blending, Madeline! You blended sounds to read those words!',art:'✨ 🐸 ✨',next:()=>{levelIndex=2;wordIndex=0;renderSound();}},
+      digraphs:{title:'Letter-team detective!',copy:'You read words with sh, th, and ch, then tackled a whole story!',speech:'You did it, Madeline! You read words with sh, th, and ch. Those letter teams make one sound!',art:'🚢 🏆 🐠',next:renderComplete}
+    };
+    function tossConfetti(count=34) {
+      for(let i=0;i<count;i++)setTimeout(()=>{const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#ff7968','#ffc857','#58b987','#a98be8','#58c6d6'][i%5];c.style.animationDelay=Math.random()*.55+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3600);},i*24);
+    }
+    function renderCelebration(key) {
+      const celebration=celebrations[key];
+      if(!celebration)return renderHome();
+      phase='celebrate';celebrationKey=key;saveProgress();
+      main.innerHTML=`<section class="screen panel"><div class="eyebrow">Section complete!</div><div class="celebration-art" aria-hidden="true">${celebration.art}</div><div class="complete-stars">⭐ ⭐ ⭐</div><h1>${celebration.title}</h1><p class="celebration-copy">${celebration.copy}</p><button class="primary" id="continueCelebration">Keep going! →</button><p class="tiny-note">Every sound you try helps your reading grow 💛</p></section>`;
+      tossConfetti(42);speak(celebration.speech);
+      document.querySelector('#continueCelebration').onclick=()=>{celebrationKey=null;celebration.next();};
+    }
+    function renderComplete() {
+      phase='complete';saveProgress();
+      setDirections('You did it! You practiced vowel sounds, listened for sounds, built words, and read a story. You are a wonderful word explorer!', false);
+      main.innerHTML=`<section class="screen panel"><div class="eyebrow">Garden helper extraordinaire</div><div class="garden-art" aria-hidden="true">🌻 🐝 🌈</div><div class="complete-stars">⭐ ⭐ ⭐</div><h1>You grew<br><span>so many words!</span></h1><p class="intro">You practiced vowel sounds, listened for sounds in words, and read short words, words with blends, and words with letter teams. Every sound-out and reread made you stronger!</p><button class="primary" id="again">Play again! ↻</button><p class="tiny-note">Brave readers keep trying—and you did! 💛</p></section>`;
+      speak('Hooray! You grew so many words! You practiced vowel sounds and read words. You are a wonderful word explorer!');
+      tossConfetti(52);
+      document.querySelector('#again').onclick=()=>{levelIndex=0;wordIndex=0;vowelIndex=0;renderVowel();speak('Let’s play again!');};
+    }
+    if(restoreProgress())resumeProgress();else renderHome();
+  </script>
+</body>
+</html>
