@@ -130,7 +130,9 @@
         const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
         if(!saved||!['vowel','sound','build','story','celebrate','complete'].includes(saved.phase))return false;
         if(!Number.isInteger(saved.levelIndex)||saved.levelIndex<0||saved.levelIndex>=levels.length)return false;
-        if(!Number.isInteger(saved.wordIndex)||saved.wordIndex<0||saved.wordIndex>=levels[saved.levelIndex].words.length)return false;
+        const wordCount=levels[saved.levelIndex].words.length;
+        const mayBeAtEnd=['story','celebrate','complete'].includes(saved.phase);
+        if(!Number.isInteger(saved.wordIndex)||saved.wordIndex<0||saved.wordIndex>wordCount||(!mayBeAtEnd&&saved.wordIndex===wordCount))return false;
         if(!Number.isInteger(saved.vowelIndex)||saved.vowelIndex<0||saved.vowelIndex>vowels.length)return false;
         levelIndex=saved.levelIndex;wordIndex=saved.wordIndex;vowelIndex=saved.vowelIndex;
         phase=saved.phase;letters=Array.isArray(saved.letters)?saved.letters:[];celebrationKey=saved.celebrationKey||null;savedAvailable=true;return true;
