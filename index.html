@@ -276,10 +276,10 @@
       document.querySelector('#nextLevel').onclick=()=>renderCelebration(['cvc','blends','digraphs'][levelIndex]);
     }
     const celebrations = {
-      vowels:{title:'Vowel garden blooming!',copy:'You practiced five vowel sounds. Your listening is growing stronger!',speech:'You did it, Madeline! Your vowel garden is blooming. You practiced five vowel sounds!',art:'🌷 🌼 🌻',next:()=>renderSound()},
-      cvc:{title:'Short-word garden grown!',copy:'You read short words with three sounds and a whole little story. That is wonderful reading!',speech:'Hooray, Madeline! You read those short words and your little story!',art:'🌱 🌻 🐝',next:()=>{levelIndex=1;wordIndex=0;renderSound();}},
-      blends:{title:'Sound-blending star!',copy:'You blended sounds together at the start of words to read them. Amazing work!',speech:'Amazing blending, Madeline! You blended sounds to read those words!',art:'✨ 🐸 ✨',next:()=>{levelIndex=2;wordIndex=0;renderSound();}},
-      digraphs:{title:'Letter-team detective!',copy:'You read words with sh, th, and ch, then tackled a whole story!',speech:'You did it, Madeline! You read words with sh, th, and ch. Those letter teams make one sound!',art:'🚢 🏆 🐠',next:renderComplete}
+      vowels:{title:'Vowel garden blooming!',copy:'You practiced five vowel sounds. Your listening is growing stronger!',speech:'You did it, Madi! Your vowel garden is blooming. You practiced five vowel sounds!',art:'🌷 🌼 🌻',next:()=>renderSound()},
+      cvc:{title:'Short-word garden grown!',copy:'You read short words with three sounds and a whole little story. That is wonderful reading!',speech:'Hooray, Madi! You read those short words and your little story!',art:'🌱 🌻 🐝',next:()=>{levelIndex=1;wordIndex=0;renderSound();}},
+      blends:{title:'Sound-blending star!',copy:'You blended sounds together at the start of words to read them. Amazing work!',speech:'Amazing blending, Madi! You blended sounds to read those words!',art:'✨ 🐸 ✨',next:()=>{levelIndex=2;wordIndex=0;renderSound();}},
+      digraphs:{title:'Letter-team detective!',copy:'You read words with sh, th, and ch, then tackled a whole story!',speech:'You did it, Madi! You read words with sh, th, and ch. Those letter teams make one sound!',art:'🚢 🏆 🐠',next:renderComplete}
     };
     function tossConfetti(count=34) {
       for(let i=0;i<count;i++)setTimeout(()=>{const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#ff7968','#ffc857','#58b987','#a98be8','#58c6d6'][i%5];c.style.animationDelay=Math.random()*.55+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3600);},i*24);
