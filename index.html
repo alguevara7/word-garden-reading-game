@@ -300,7 +300,8 @@
       tossConfetti(52);
       document.querySelector('#again').onclick=()=>{levelIndex=0;wordIndex=0;vowelIndex=0;renderVowel();speak('Let’s play again!');};
     }
-    if(restoreProgress())resumeProgress();else renderHome();
+    restoreProgress();
+    renderHome();
   </script>
 </body>
 </html>
