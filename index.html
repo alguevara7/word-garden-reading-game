@@ -113,7 +113,9 @@
     const soundToggle = document.querySelector('#soundToggle');
     const marinAudio = JSON.parse(document.querySelector('#marin-audio-manifest').textContent);
     const audioPlayer = new Audio();
+    const MARIN_FALLBACK_TIMEOUT = 10000;
     let soundOn = true, levelIndex = 0, wordIndex = 0, vowelIndex = 0, phase = 'home', letters = [], locked = false, englishVoice = null, savedAvailable = false, celebrationKey = null;
+    let speechAttempt = 0, marinFallbackTimer = null;
     const SAVE_KEY = 'word-garden-progress-v1';
     let currentDirections = 'Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.';
     const level = () => levels[levelIndex];
@@ -153,11 +155,29 @@
     if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', () => { englishVoice = chooseVoice(); });
     function speak(text, slow = false) {
       if (!soundOn) return;
+      const attempt = ++speechAttempt;
+      clearTimeout(marinFallbackTimer);
+      marinFallbackTimer = null;
       if ('speechSynthesis' in window) speechSynthesis.cancel();
+      audioPlayer.pause(); audioPlayer.currentTime=0;
       const clip = marinAudio[text];
       if (clip) {
-        audioPlayer.pause(); audioPlayer.currentTime=0; audioPlayer.src=clip; audioPlayer.playbackRate=slow?.82:1;
-        audioPlayer.play().catch(() => speakWithBrowserVoice(text,slow));
+        let settled = false;
+        const fallback = () => {
+          if (settled || attempt !== speechAttempt || !soundOn) return;
+          settled = true;
+          marinFallbackTimer = null;
+          audioPlayer.pause();
+          speakWithBrowserVoice(text,slow);
+        };
+        audioPlayer.src=clip; audioPlayer.playbackRate=slow?.82:1;
+        marinFallbackTimer = setTimeout(fallback, MARIN_FALLBACK_TIMEOUT);
+        audioPlayer.play().then(() => {
+          if (attempt !== speechAttempt || settled) return;
+          settled = true;
+          clearTimeout(marinFallbackTimer);
+          marinFallbackTimer = null;
+        }).catch(fallback);
         return;
       }
       speakWithBrowserVoice(text,slow);
@@ -175,6 +195,8 @@
     soundToggle.addEventListener('click', () => {
       soundOn = !soundOn; soundToggle.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off';
       if (!soundOn) {
+        speechAttempt++;
+        clearTimeout(marinFallbackTimer); marinFallbackTimer=null;
         if ('speechSynthesis' in window) speechSynthesis.cancel();
         audioPlayer.pause(); audioPlayer.currentTime=0;
       }
