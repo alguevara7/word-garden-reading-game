@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#fff8e8" />
-  <title>Word Garden — A Reading Adventure</title>
+  <title>Word Garden with Madi — A Reading Adventure</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap');
     :root { --ink:#27334b; --muted:#727e91; --coral:#ff7968; --yellow:#ffc857; --green:#58b987; --lilac:#a98be8; --paper:#fffdf8; }
@@ -77,7 +77,7 @@
 <body>
   <div class="sky" aria-hidden="true"><div class="cloud one">☁️</div><div class="cloud two">☁️</div></div>
   <div class="app">
-    <header><div class="brand"><span class="brand-mark">🌱</span> Word Garden</div><div class="header-actions"><button class="directions-toggle" id="hearDirections">🗣 Hear directions</button><button class="sound-toggle" id="soundToggle" aria-label="Toggle read aloud">🔊 Sound on</button></div></header>
+    <header><div class="brand"><span class="brand-mark">🌱</span> Word Garden with Madi</div><div class="header-actions"><button class="directions-toggle" id="hearDirections">🗣 Hear directions</button><button class="sound-toggle" id="soundToggle" aria-label="Toggle read aloud">🔊 Sound on</button></div></header>
     <main id="main" aria-live="polite"></main>
     <footer>A little reading adventure, made just for you ✨ · Some narration is AI-generated.</footer>
   </div>
@@ -211,7 +211,7 @@
     function renderHome() {
       phase = 'home';
       setDirections('Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.', false);
-      main.innerHTML = `<section class="screen panel"><div class="eyebrow">A tiny adventure in reading</div><div class="garden-art" aria-hidden="true">🌼 🐝 🌷</div><h1>Welcome to<br><span>Word Garden!</span></h1><p class="intro">Warm up your vowel sounds, listen for sounds in words, then build and read short words, words with blends, and words with letter teams.</p>${savedAvailable?'<button class="secondary" id="continue" style="margin:0 8px 12px">Continue adventure ↗</button>':''}<button class="primary" id="start">${savedAvailable?'Start over':'Let’s play!'} <span aria-hidden="true">→</span></button><p class="tiny-note">No rush. Listen again, sound it out, and celebrate every try 💛</p></section>`;
+      main.innerHTML = `<section class="screen panel"><div class="eyebrow">A tiny adventure in reading</div><div class="garden-art" aria-hidden="true">🌼 🐝 🌷</div><h1>Welcome to<br><span>Word Garden with Madi!</span></h1><p class="intro">Warm up your vowel sounds, listen for sounds in words, then build and read short words, words with blends, and words with letter teams.</p>${savedAvailable?'<button class="secondary" id="continue" style="margin:0 8px 12px">Continue adventure ↗</button>':''}<button class="primary" id="start">${savedAvailable?'Start over':'Let’s play!'} <span aria-hidden="true">→</span></button><p class="tiny-note">No rush. Listen again, sound it out, and celebrate every try 💛</p></section>`;
       if(savedAvailable)document.querySelector('#continue').onclick=resumeProgress;
       document.querySelector('#start').addEventListener('click', () => { try{localStorage.removeItem(SAVE_KEY);}catch(_){} savedAvailable=false; levelIndex=0; wordIndex=0; vowelIndex=0; letters=[]; renderVowel(); });
     }
