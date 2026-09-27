@@ -210,7 +210,7 @@
     }
     function renderHome() {
       phase = 'home';
-      setDirections('Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.', false);
+      setDirections('Welcome to Word Garden! Ask a grown-up to press Let’s play to start your reading adventure.');
       main.innerHTML = `<section class="screen panel"><div class="eyebrow">A tiny adventure in reading</div><div class="garden-art" aria-hidden="true">🌼 🐝 🌷</div><h1>Welcome to<br><span>Word Garden with Madi!</span></h1><p class="intro">Warm up your vowel sounds, listen for sounds in words, then build and read short words, words with blends, and words with letter teams.</p>${savedAvailable?'<button class="secondary" id="continue" style="margin:0 8px 12px">Continue adventure ↗</button>':''}<button class="primary" id="start">${savedAvailable?'Start over':'Let’s play!'} <span aria-hidden="true">→</span></button><p class="tiny-note">No rush. Listen again, sound it out, and celebrate every try 💛</p></section>`;
       if(savedAvailable)document.querySelector('#continue').onclick=resumeProgress;
       document.querySelector('#start').addEventListener('click', () => { try{localStorage.removeItem(SAVE_KEY);}catch(_){} savedAvailable=false; levelIndex=0; wordIndex=0; vowelIndex=0; letters=[]; renderVowel(); });
